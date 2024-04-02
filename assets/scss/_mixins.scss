@@ -1,0 +1,75 @@
+@use './vars';
+
+@mixin reset {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+    margin-block-start: 0em;
+    margin-block-end: 0em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 0px;
+  }
+  
+  @mixin container {
+    width: 100%;
+    max-width: vars.$containerWidth;
+    margin: 0 auto;
+  }
+  
+  @mixin containerFull {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  @mixin globalPadding {
+    padding: 1.5rem;
+  }
+  
+  @mixin flex {
+    display: flex;
+  }
+  
+  @mixin grid {
+    display: grid;
+  }
+  
+  @mixin border {
+    border: solid 1px #ccc;
+    border-radius: 3px;
+  }
+  
+  @mixin nl2br {
+    white-space: pre-wrap;
+  }
+  
+  @mixin imageCover($maxWidth, $height, $bgSize) {
+    width: 100%;
+    max-width: $maxWidth;
+    height: $height;            
+    background-size: $bgSize;
+    background-repeat: no-repeat;
+    background-position: center;            
+  }
+  
+  @mixin imageFullWidth {
+    width: 100%;
+  }
+
+  @mixin clearList {
+    list-style-type: none;
+    @include reset;
+  }
+
+  @mixin modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+  }
+  
