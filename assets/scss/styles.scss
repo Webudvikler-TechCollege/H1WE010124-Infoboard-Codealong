@@ -8,10 +8,21 @@ body {
   color: vars.$txtColor;
 }
 
+h2 {
+  @include mixins.reset;
+}
+
+
+
 .container {
   display: grid;
-  grid-template-columns: 1fr 3fr;
-  grid-gap: 10px;
+  grid-template-columns: 1fr;
+  grid-gap: 0px;
+
+  @media screen and (min-width: 768px) {
+    grid-template-columns: 1fr 3fr;    
+    grid-gap: 10px;
+  }
 }
 
 .left-wrapper {
@@ -26,6 +37,98 @@ body {
 }
 
 .right-column {
-  @include mixins.globalPadding;
+  padding: 0px;
   @include mixins.border;
+  @media screen and (min-width: 768px) {
+    @include mixins.globalPadding;
+  }
+}
+
+#datetime {
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+  
+  #blink {
+    animation: blink 1s step-end infinite;
+  }
+  
+  display: none;
+  @media screen and (min-width: 768px) {
+    display: block;
+  }
+
+}
+
+#weeksmenu {
+  ul {
+    @include mixins.clearList;
+
+    li {
+      display: grid;
+      grid-template-columns: 1fr 4fr;
+      grid-gap: 15px;
+      color: #666;
+
+      &.selected {
+        font-weight: bold;
+        color: black;
+      }
+
+      span:first-child {
+        text-transform: capitalize;
+      }
+    }
+  }
+}
+
+#busplan {
+  ul {
+    @include mixins.clearList;
+    display: grid;
+    grid-template-columns: 2fr 8fr 2fr;
+    grid-gap: 15px;
+
+    &:first-of-type li {
+      font-weight: bold;
+    }
+
+    li {
+      &:last-child {
+        text-align: right;
+      }
+  
+    }
+  }
+}
+
+#eventWrapper {
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    th:nth-child(2), td:nth-child(2) {
+      display: none;
+    }
+
+    @media screen and (min-width: 768px) {
+      th:nth-child(2), td:nth-child(2) {
+        display: block;
+      }
+    }
+
+    tr:nth-child(odd) {
+      background-color: #f2f2f2;
+    }
+  }
 }
