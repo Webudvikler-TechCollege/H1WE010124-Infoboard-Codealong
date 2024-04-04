@@ -1,8 +1,11 @@
+/**
+ * Function to fetch data from an endpoint
+ * @param {*} endpoint 
+ * @returns object 
+ */
 export const myFetch = async (endpoint) => {
-	let response = ''
-
 	try {
-		response = await fetch(endpoint)
+		const response = await fetch(endpoint)
 		if (response.ok) {
 			const data = await response.json()
 			return data
