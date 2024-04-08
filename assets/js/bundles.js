@@ -1,5 +1,5 @@
 /**
- * Import and call all the components
+ * Import all the components
  */
-import { Menu } from './Components/Menu.js'
-Menu()
+import { BusPlan } from './Components/BusPlan.js'
+BusPlan()
