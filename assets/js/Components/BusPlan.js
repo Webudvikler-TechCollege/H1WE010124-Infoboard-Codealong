@@ -62,8 +62,6 @@ const calcRemaingTime = (departure_time) => {
 		depMinutes
 	).getTime();
 
-	console.log(new Date(depTimeStamp))
-
 	const diff_seconds = Math.abs(Math.floor((depTimeStamp - curTimeStamp) / 1000));
 	const hours = Math.floor(diff_seconds / 3600);
 	const minutes = Math.floor(diff_seconds / 60);
