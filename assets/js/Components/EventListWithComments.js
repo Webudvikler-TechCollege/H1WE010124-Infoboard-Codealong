@@ -4,7 +4,7 @@ import { dayMonth2dk, timeToLocal } from "../Utils/dateUtils.js"
 /**
  * Fetches the events from the API and displays them in the DOM
  */
-export const Events = async () => {
+export const EventList = async () => {
   // Get the config settings
   const config = await myFetch("./config.json")
 
@@ -37,7 +37,7 @@ export const Events = async () => {
     event.StartDate = event.StartDate.replace("+01:00", "+00:00")
 
     // Set the time format to hour:minute on the property item.Time
-    event.Time = timeToLocal(activity.StartDate)
+    event.Time = timeToLocal(event.StartDate)
 
     // Replace cryptic names and abbreviations with readable versions on the properties item.Education and item.Subject
     arrFriendlyWords.map(word => {
@@ -99,14 +99,14 @@ export const Events = async () => {
   }
 
   // Limits arrCurEvents to max amount number from config object
-  if (config.max_num_current_events) {
-    arrCurEvents = arrCurEvents.slice(0, config.max_num_current_events)
+  if (config.max_num_events) {
+    arrCurEvents = arrCurEvents.slice(0, config.max_num_events)
   }
 
   // Maps arrCurEvents and adds the html to accHtml
   arrCurEvents.map(event => {
     // Ternary value to check if the property Day exists - if true, create a day row, else create a row
-    accHtml += item.Day ? createDayRow(event) : createRow(event)
+    accHtml += event.Day ? createDayRow(event) : createRow(event)
   })
 
   // Ends the table
