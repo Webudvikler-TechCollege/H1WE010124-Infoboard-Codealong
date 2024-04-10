@@ -1,61 +1,60 @@
 import { myFetch } from "../Utils/apiUtils.js"
-import { dayMonth2dk } from "../Utils/dateUtils.js"
+import { dayMonth2dk, timeToLocal } from "../Utils/dateUtils.js"
 
-export const ActivityList = async () => {
+/**
+ * Fetches the events from the API and displays them in the DOM
+ */
+export const Events = async () => {
   // Get the config settings
   const config = await myFetch("./config.json")
 
   // Get the current date
-  let curdate = new Date()
-  // Get the current date as a unix timestamp
-  let curstamp = Math.round(curdate.getTime() / 1000)
-  // Get the next day's midnight as a unix timestamp
-  let nextdaystamp = Math.round(curdate.setHours(0, 0, 0, 0) / 1000) + 86400
+  let curDate = new Date()
+  // Get the current date as a unix timestamp (divide to seconds)
+  let curStamp = Math.round(curDate.getTime() / 1000)
+  // Get the next day's midnight as a unix timestamp (divide to seconds)
+  let nextDayStamp = Math.round(curDate.setHours(0, 0, 0, 0) / 1000) + 86400
 
-  // Get the data
-  const endpoint =
-    "https://iws.itcn.dk/techcollege/schedules?departmentCode=smed"
-  const resultdata = await myFetch(endpoint)
-  let { value: data } = resultdata
+  // Get the data from the API
+  const endpoint = "https://iws.itcn.dk/techcollege/schedules?departmentCode=smed"
+  const resultData = await myFetch(endpoint)
+  // Destrucure the resultdata object to get the value property
+  const { value: apiData } = resultData
 
   // Filter the data for unwanted educations via an array from the config
-  data = data.filter((elm) =>
+  let filteredData = apiData.filter((elm) =>
     config.array_valid_educations.includes(elm.Education)
   )
 
   // Get readable subjects and educations from the API
-  const friendly_names = await myFetch(
-    "https://api.mediehuset.net/infoboard/subjects"
-  )
-  const { result: arr_friendly } = friendly_names
+  const friendlyNames = await myFetch("https://api.mediehuset.net/infoboard/subjects")
+  // Destructure the result object to get the result property
+  const { result: arrFriendlyWords } = friendlyNames
 
-  // Map the data
-  data.map((activity) => {
+  // Map and process the data - adjust timezone, set time format, replace cryptic names, add timestamp
+  filteredData.map(event => {
     // Adjust the timezone to Denmark
-    activity.StartDate = activity.StartDate.replace("+01:00", "+00:00")
+    event.StartDate = event.StartDate.replace("+01:00", "+00:00")
 
     // Set the time format to hour:minute on the property item.Time
-    activity.Time = new Date(activity.StartDate).toLocaleTimeString("en-GB", {
-      hour: "2-digit",
-      minute: "2-digit",
-    })
+    event.Time = timeToLocal(activity.StartDate)
 
-    // Replace cryptic names and abbreviations with readable versions
-    arr_friendly.map((word) => {
-      if (word.name.toUpperCase() === activity.Education.toUpperCase()) {
-        activity.Education = word.friendly_name
+    // Replace cryptic names and abbreviations with readable versions on the properties item.Education and item.Subject
+    arrFriendlyWords.map(word => {
+      if(word.name.toUpperCase() === event.Education.toUpperCase()) {
+        event.Education = word.friendly_name
       }
-      if (word.name.toUpperCase() === activity.Subject.toUpperCase()) {
-        activity.Subject = word.friendly_name
+      if(word.name.toUpperCase() === event.Subject.toUpperCase()) {
+        event.Subject = word.friendly_name
       }
     })
 
-    // Add the Stamp property with a timestamp (time in seconds)
-    activity.Stamp = Math.round(new Date(activity.StartDate).getTime() / 1000)
+    // Add the Stamp property with a timestamp (divide to seconds)
+    event.Stamp = Math.round(new Date(event.StartDate).getTime() / 1000)
   })
 
   // Sort the array by start time and education
-  data.sort((a, b) => {
+  filteredData.sort((a, b) => {
     if (a.StartDate === b.StartDate) {
       return a.Education < b.Education ? -1 : 1
     } else {
@@ -63,8 +62,8 @@ export const ActivityList = async () => {
     }
   })
 
-  // Set var with table header
-  let acc_html = `
+  // Set accummulated var with table header
+  let accHtml = `
 			<table>
 				<tr>
 					<th>Kl.</th>
@@ -74,51 +73,53 @@ export const ActivityList = async () => {
 					<th>Lokale</th>
 				</tr>`
 
-  // Create array for current activities
-  let activities = []
+  // Create array for current events to display
+  let arrCurEvents = []
 
-  //
-  activities.push(
-    ...data.filter(
-      (elm) => elm.Stamp + 3600 >= curstamp && elm.Stamp < nextdaystamp
+  // Push todays events to arrCurEvents
+  arrCurEvents.push(
+    ...filteredData.filter(
+      (elm) => elm.Stamp + 3600 >= curStamp && elm.Stamp < nextDayStamp
     )
   )
 
-  // Sætter array til næste dags aktiviteter
-  let nextday_activities = []
-  // Henter næste dags aktiviter hvis stamp er større end / lig midnat
-  nextday_activities.push(...data.filter((elm) => elm.Stamp >= nextdaystamp))
+  // Set array for next day's events
+  let arrNextDayEvents = []
+  // Push elements to arrNextDayEvents if greater than next day at midnight
+  arrNextDayEvents.push(...filteredData.filter((elm) => elm.Stamp >= nextDayStamp))
 
-  // Hvis der er nogle næste dags aktiviteter
-  if (nextday_activities) {
-    // Laver læsevenlig dato format (Eks: Mandag d. 16. maj)
-    const nextday_friendly = dayMonth2dk(nextday_activities[0].StartDate)
-    // Tilføjer array index med læsevenlig dato til activities
-    activities.push({ Day: nextday_friendly })
-    // Tilføjer næste dags aktiviteter til activities
-    activities.push(...nextday_activities)
+  // If arrNextDayEvents has any events 
+  if (arrNextDayEvents) {
+    // Set a readabe date string with date utility function dayMonth2dk
+    const nextDayString = dayMonth2dk(arrNextDayEvents[0].StartDate)
+    // Add next day's events to arrCurEvents
+    arrCurEvents.push({ Day: nextDayString })
+    // Add arrNextDayEvents to arrCurEvents with a spread operator (...)
+    arrCurEvents.push(...arrNextDayEvents)
   }
 
-  // Begrænser antallet af aktiviteter med tal fra config - henter alle hvis 0
-  if (config.max_num_activities) {
-    activities = activities.slice(0, config.max_num_activities)
+  // Limits arrCurEvents to max amount number from config object
+  if (config.max_num_current_events) {
+    arrCurEvents = arrCurEvents.slice(0, config.max_num_current_events)
   }
 
-  // Mapper activities med table row functions
-  activities.map((item) => {
-    // Ternary value betinget af om Day property findes på item object
-    acc_html += item.Day ? createDayRow(item) : createRow(item)
+  // Maps arrCurEvents and adds the html to accHtml
+  arrCurEvents.map(event => {
+    // Ternary value to check if the property Day exists - if true, create a day row, else create a row
+    accHtml += item.Day ? createDayRow(event) : createRow(event)
   })
 
-  // Afslutter html table
-  acc_html += `</table>`
+  // Ends the table
+  accHtml += `</table>`
 
-  const container = document.getElementById("eventWrapper") // Get the activities element
-  container.innerHTML = acc_html // Set the innerHTML of the activities element
+  // Get the html element #eventWrapper
+  const container = document.getElementById("eventWrapper") // Get the current_events element
+  // Set the innerHTML of the #eventWrapper element
+  container.innerHTML = accHtml 
 }
 
 /**
- * Create the activities element row
+ * Create the current_events element row
  * @param {Object} item - Object with activity data
  * @returns HTML string
  */
@@ -134,7 +135,7 @@ function createRow({ Time, Education, Team, Subject, Room }) {
 }
 
 /**
- * Create the activities element day row
+ * Create the current_events element day row
  * @param {Object} item - Object with date and day name
  * @returns HTML string
  */
