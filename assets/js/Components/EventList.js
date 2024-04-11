@@ -1,147 +1,102 @@
-import { myFetch } from "../Utils/apiUtils.js"
-import { dayMonth2dk, timeToLocal } from "../Utils/dateUtils.js"
+import { myFetch } from '../Utils/apiUtils.js'
+import { dayMonth2dk, timeToLocal } from '../Utils/dateUtils.js'
 
-/**
- * Fetches the events from the API and displays them in the DOM
- */
 export const EventList = async () => {
-  // Get the config settings
-  const config = await myFetch("./config.json")
+	// Fetch the config.json file
+	const config = await myFetch('../../../config.json')
 
-  // Get the current date
-  let curDate = new Date()
-  // Get the current date as a unix timestamp (divide to seconds)
-  let curStamp = Math.round(curDate.getTime() / 1000)
-  // Get the next day's midnight as a unix timestamp (divide to seconds)
-  let nextDayStamp = Math.round(curDate.setHours(0, 0, 0, 0) / 1000) + 86400
+	// Fetch the events from the API
+	const apiData = await myFetch('https://iws.itcn.dk/techcollege/schedules?departmentCode=smed')
+	// Destructure the value from the apiData
+	const { value: eventData } = apiData
 
-  // Get the data from the API
-  const endpoint = "https://iws.itcn.dk/techcollege/schedules?departmentCode=smed"
-  const resultData = await myFetch(endpoint)
-  // Destrucure the resultdata object to get the value property
-  const { value: apiData } = resultData
+	// Fetch the friendly words from the API
+	const friendlyApiData = await myFetch('https://api.mediehuset.net/infoboard/subjects')
+	const { result: friendlyData } = friendlyApiData
 
-  // Filter the data for unwanted educations via an array from the config
-  let filteredData = apiData.filter((elm) =>
-    config.array_valid_educations.includes(elm.Education)
-  )
+	// Filter the data for the valid educations
+	const filteredData = eventData.filter(elm => 
+		config.array_valid_educations.includes(elm.Education)
+	)
 
-  // Get readable subjects and educations from the API
-  const friendlyNames = await myFetch("https://api.mediehuset.net/infoboard/subjects")
-  // Destructure the result object to get the result property
-  const { result: arrFriendlyWords } = friendlyNames
+	// Map over the filtered data
+	filteredData.map(event => {
+		// Set a property on the event object with the time format
+		event.Time = timeToLocal(event.StartDate)
 
-  // Map and process the data - adjust timezone, set time format, replace cryptic names, add timestamp
-  filteredData.map(event => {
-    // Adjust the timezone to Denmark
-    event.StartDate = event.StartDate.replace("+01:00", "+00:00")
+		// Set a property on the event object with a timestamp
+		event.Timestamp = new Date(event.StartDate).getTime()
 
-    // Set the time format to hour:minute on the property item.Time
-    event.Time = timeToLocal(event.StartDate)
+		// Set a property on the event object with the friendly name if the education or subject exists
+		friendlyData.map(word => {
+			if(word.name.toUpperCase() === event.Education.toUpperCase()) {
+				event.Education = word.friendly_name
+			}
+			if(word.name.toUpperCase() === event.Subject.toUpperCase()) {
+				event.Subject = word.friendly_name
+			}
+		})
+	})
 
-    // Replace cryptic names and abbreviations with readable versions on the properties item.Education and item.Subject
-    arrFriendlyWords.map(word => {
-      if(word.name.toUpperCase() === event.Education.toUpperCase()) {
-        event.Education = word.friendly_name
-      }
-      if(word.name.toUpperCase() === event.Subject.toUpperCase()) {
-        event.Subject = word.friendly_name
-      }
-    })
+	// Sort the data by date and education
+	filteredData.sort((a,b) => {
+		if(a.StartDate === b.StartDate) {
+			return a.Education < b.Education ? -1 : 1
+		} else {
+			return a.StartDate < b.StartDate ? -1 : 1
+		}
+	})
 
-    // Add the Stamp property with a timestamp (divide to seconds)
-    event.Stamp = Math.round(new Date(event.StartDate).getTime() / 1000)
-  })
+	// Get the current day and the next day in timestamp format
+	const curDayStamp = new Date().getTime()
+	const nextDayStamp = new Date().setHours(0,0,0,0)+86400000
 
-  // Sort the array by start time and education
-  filteredData.sort((a, b) => {
-    if (a.StartDate === b.StartDate) {
-      return a.Education < b.Education ? -1 : 1
-    } else {
-      return a.StartDate < b.StartDate ? -1 : 1
-    }
-  })
+	// Filter the data for the current day events
+	const arrCurDayEvents = filteredData.filter(
+		elm => (elm.Timestamp+3600000) >= curDayStamp && elm.Timestamp < nextDayStamp
+	)
 
-  // Set accummulated var with table header
-  let accHtml = `
-			<table>
-				<tr>
-					<th>Kl.</th>
-					<th>Uddannelse</th>
-					<th>Hold</th>
-					<th>Fag</th>
-					<th>Lokale</th>
-				</tr>`
+	// Filter the data for the next day events
+	const arrNextDayEvents = filteredData.filter(
+		(elm) => elm.Timestamp >= nextDayStamp
+	)
+	
+	// If there are events for the next day, add a header to the array and merge the arrays
+	if(arrNextDayEvents.length) {
+		// Set the day and month for the next day
+		const strNextDay = dayMonth2dk(arrNextDayEvents[0].StartDate)
+		// Add a header to the array
+		arrCurDayEvents.push({ Day: strNextDay })
+		// Merge the arrays with a spread operator
+		arrCurDayEvents.push(...arrNextDayEvents)
+	}
 
-  // Create array for current events to display
-  let arrCurEvents = []
+	// Slice the array if the max_num_events is set in the config
+	let arrSlicedEvents = []
 
-  // Push todays events to arrCurEvents
-  arrCurEvents.push(
-    ...filteredData.filter(
-      (elm) => elm.Stamp + 3600 >= curStamp && elm.Stamp < nextDayStamp
-    )
-  )
+	// If the max_num_events is set in the config, slice the array
+	if(config.max_num_events) {
+		arrSlicedEvents = arrCurDayEvents.slice(0, config.max_num_events)
+	}
 
-  // Set array for next day's events
-  let arrNextDayEvents = []
-  // Push elements to arrNextDayEvents if greater than next day at midnight
-  arrNextDayEvents.push(...filteredData.filter((elm) => elm.Stamp >= nextDayStamp))
+	// Create html elements for the events
+	const div = document.createElement('div')
+	div.classList.add('event-list')
 
-  // If arrNextDayEvents has any events 
-  if (arrNextDayEvents) {
-    // Set a readabe date string with date utility function dayMonth2dk
-    const nextDayString = dayMonth2dk(arrNextDayEvents[0].StartDate)
-    // Add next day's events to arrCurEvents
-    arrCurEvents.push({ Day: nextDayString })
-    // Add arrNextDayEvents to arrCurEvents with a spread operator (...)
-    arrCurEvents.push(...arrNextDayEvents)
-  }
+	arrSlicedEvents.map(event => {
+		const divTime = document.createElement('div')
+		divTime.innerText = event.Time
+		const divEducation = document.createElement('div')
+		divEducation.innerText = event.Education
+		const divSubject = document.createElement('div')
+		divSubject.innerText = event.Subject
+		const divTeam = document.createElement('div')
+		divTeam.innerText = event.Team
+		const divRoom = document.createElement('div')
+		divRoom.innerText = event.Room
 
-  // Limits arrCurEvents to max amount number from config object
-  if (config.max_num_events) {
-    arrCurEvents = arrCurEvents.slice(0, config.max_num_events)
-  }
+		div.append(divTime, divEducation, divSubject, divTeam, divRoom)
+	})
 
-  // Maps arrCurEvents and adds the html to accHtml
-  arrCurEvents.map(event => {
-    // Ternary value to check if the property Day exists - if true, create a day row, else create a row
-    accHtml += event.Day ? createDayRow(event) : createRow(event)
-  })
-
-  // Ends the table
-  accHtml += `</table>`
-
-  // Get the html element #eventWrapper
-  const container = document.getElementById("events") // Get the current_events element
-  // Set the innerHTML of the #eventWrapper element
-  container.innerHTML = accHtml 
-}
-
-/**
- * Create the current_events element row
- * @param {Object} item - Object with activity data
- * @returns HTML string
- */
-function createRow({ Time, Education, Team, Subject, Room }) {
-  return `
-		  <tr>
-		  <td>${Time}</td>
-		  <td>${Education}</td>
-		  <td>${Team}</td>
-		  <td>${Subject}</td>
-		  <td>${Room}</td>
-		 </tr>`
-}
-
-/**
- * Create the current_events element day row
- * @param {Object} item - Object with date and day name
- * @returns HTML string
- */
-function createDayRow({ Day }) {
-  return `
-	<tr>
-		<td colspan="5">${Day}</td>
-	</tr>`
+	document.getElementById('events').append(div)
 }

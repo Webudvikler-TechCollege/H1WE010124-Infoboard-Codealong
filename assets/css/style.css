@@ -27,3 +27,13 @@ table {
 		border-bottom: solid 1px #000;
 	}
 }
+
+.event-list {
+	display: grid;
+	grid-template-columns: 1fr 3fr 5fr 2fr 1fr;
+	border: solid 1px #000;
+
+	div {
+		border: solid 1px #000;
+	}
+}
