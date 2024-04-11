@@ -113,7 +113,7 @@ export const EventList = async () => {
   accHtml += `</table>`
 
   // Get the html element #eventWrapper
-  const container = document.getElementById("eventWrapper") // Get the current_events element
+  const container = document.getElementById("events") // Get the current_events element
   // Set the innerHTML of the #eventWrapper element
   container.innerHTML = accHtml 
 }

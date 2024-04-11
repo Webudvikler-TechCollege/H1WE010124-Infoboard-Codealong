@@ -3,8 +3,8 @@
  */
 import { BusPlan } from './Components/BusPlan.js'
 import { Menu } from './Components/Menu.js'
-import { Events } from './Components/Events.js'
+import { EventList } from './Components/EventList.js'
 
 BusPlan()
 Menu()
-Events()
+EventList()

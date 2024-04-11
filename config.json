@@ -1,5 +1,5 @@
 {
-    "max_num_activities": 16,
+    "max_num_events": 16,
     "array_valid_educations": [
         "AMU indmeld",
         "Brobyg teknisk",
