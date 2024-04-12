@@ -36,4 +36,10 @@ table {
 	div {
 		border: solid 1px #000;
 	}
+
+	.day {
+		grid-column-start: 1;
+		grid-column-end: 6;
+		font-weight: bold;
+	}
 }

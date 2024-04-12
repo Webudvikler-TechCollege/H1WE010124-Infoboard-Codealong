@@ -47,8 +47,10 @@ export const EventList = async () => {
 		}
 	})
 
+	const curDate = new Date()
 	// Get the current day and the next day in timestamp format
-	const curDayStamp = new Date().getTime()
+	const curDayStamp = curDate.getTime()
+	//const nextDayStamp = new Date(curDate.setDate(curDate.getDate() + 1)).setHours(0,0,0,0)
 	const nextDayStamp = new Date().setHours(0,0,0,0)+86400000
 
 	// Filter the data for the current day events
@@ -84,18 +86,27 @@ export const EventList = async () => {
 	div.classList.add('event-list')
 
 	arrSlicedEvents.map(event => {
-		const divTime = document.createElement('div')
-		divTime.innerText = event.Time
-		const divEducation = document.createElement('div')
-		divEducation.innerText = event.Education
-		const divSubject = document.createElement('div')
-		divSubject.innerText = event.Subject
-		const divTeam = document.createElement('div')
-		divTeam.innerText = event.Team
-		const divRoom = document.createElement('div')
-		divRoom.innerText = event.Room
+		if(event.Day) {
+			const divDay = document.createElement('div')
+			divDay.classList.add('day')
+			divDay.innerText = event.Day
+			div.append(divDay)
 
-		div.append(divTime, divEducation, divSubject, divTeam, divRoom)
+		} else {
+			const divTime = document.createElement('div')
+			divTime.innerText = event.Time
+			const divEducation = document.createElement('div')
+			divEducation.innerText = event.Education
+			const divSubject = document.createElement('div')
+			divSubject.innerText = event.Subject
+			const divTeam = document.createElement('div')
+			divTeam.innerText = event.Team
+			const divRoom = document.createElement('div')
+			divRoom.innerText = event.Room
+			div.append(divTime, divEducation, divSubject, divTeam, divRoom)
+	
+		}
+
 	})
 
 	document.getElementById('events').append(div)
