@@ -3,7 +3,7 @@ import { myFetch } from "../Utils/apiUtils.js"
 /**
  * Function to fetch the weeks menu and display it
  */
-export const Menu = async () => {
+export const CanteenMenu = async () => {
 	// Fetch the menu from the endpoint
 	const endpoint = "https://infoskaerm.techcollege.dk/umbraco/api/content/getcanteenmenu/?type=json"
 	const data = await myFetch(endpoint)
@@ -37,6 +37,6 @@ export const Menu = async () => {
 
 	// Reload menu every hour
 	setInterval(() => {
-		Menu()
+		CanteenMenu()
 	},3600000)
 }
