@@ -1,0 +1,136 @@
+@use "./vars";
+@use "./mixins";
+
+body {
+  font-family: "Trebuchet MS", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: vars.$txtColor;
+}
+
+h2 {
+  @include mixins.reset;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 0px;
+
+  @media screen and (min-width: 768px) {
+    grid-template-columns: 1fr 3fr;
+    grid-gap: 10px;
+  }
+}
+
+.left-wrapper {
+  display: grid;
+  grid-template-rows: repeat(3, auto);
+  grid-gap: 10px;
+
+  > div {
+    @include mixins.customBox;
+    @include mixins.globalPadding;
+  }
+}
+
+.right-column {
+  padding: 0px;
+  @include mixins.customBox;
+  @media screen and (min-width: 768px) {
+    @include mixins.globalPadding;
+  }
+}
+
+#clock {
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  #blink {
+    animation: blink 1s step-end infinite;
+  }
+
+  display: none;
+  @media screen and (min-width: 768px) {
+    display: block;
+  }
+}
+
+#canteensmenu {
+  ul {
+    @include mixins.clearList;
+
+    li {
+      display: grid;
+      grid-template-columns: 1fr 4fr;
+      grid-gap: 15px;
+      color: #666;
+
+      &.selected {
+        font-weight: bold;
+        color: black;
+      }
+
+      span:first-child {
+        text-transform: capitalize;
+      }
+    }
+  }
+}
+
+#busplan {
+  ul {
+    @include mixins.clearList;
+    display: grid;
+    grid-template-columns: 4fr 6fr 2fr;
+
+    &:first-of-type li {
+      font-weight: bold;
+      border-bottom: solid 1px #000;
+    }
+
+    li {
+      &:last-child {
+        text-align: right;
+      }
+    }
+  }
+}
+
+#eventlist {
+  > div {
+    display: grid;
+    grid-template-columns: 1fr 3fr 3fr 3fr 2fr;
+    border: solid 1px #000;
+
+    div {
+      background-color: #fff;
+      padding: 0.5rem;
+    }
+
+    :nth-child(10n+1), 
+    :nth-child(10n+2),
+    :nth-child(10n+3),
+    :nth-child(10n+4),
+    :nth-child(10n+5){
+      background-color: #f2f2f2
+    }
+
+    .day {
+      background-color: #ccc;
+      grid-column-start: 1;
+      grid-column-end: 6;
+    }
+
+    .eventHead {
+      font-weight: bold;
+      background-color: #ccc;
+      border-bottom: solid 1px #000;
+    }
+
+
+  }
+}

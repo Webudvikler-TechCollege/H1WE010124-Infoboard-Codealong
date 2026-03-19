@@ -1,0 +1,151 @@
+@import url("https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap");
+/* Fonts */
+/* Measures */
+/* Colors */
+body {
+  font-family: "Trebuchet MS", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #333;
+}
+
+h2 {
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 0px;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 0px;
+}
+@media screen and (min-width: 768px) {
+  .container {
+    grid-template-columns: 1fr 3fr;
+    grid-gap: 10px;
+  }
+}
+
+.left-wrapper {
+  display: grid;
+  grid-template-rows: repeat(3, auto);
+  grid-gap: 10px;
+}
+.left-wrapper > div {
+  background-color: #F4F1DE;
+  border-color: #81B29A;
+  border-width: 4px;
+  border-style: solid;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.right-column {
+  padding: 0px;
+  background-color: #F4F1DE;
+  border-color: #81B29A;
+  border-width: 4px;
+  border-style: solid;
+  border-radius: 0.5rem;
+}
+@media screen and (min-width: 768px) {
+  .right-column {
+    padding: 1.5rem;
+  }
+}
+
+#clock {
+  display: none;
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+#clock #blink {
+  animation: blink 1s step-end infinite;
+}
+@media screen and (min-width: 768px) {
+  #clock {
+    display: block;
+  }
+}
+
+#canteensmenu ul {
+  list-style-type: none;
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 0px;
+}
+#canteensmenu ul li {
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+  grid-gap: 15px;
+  color: #666;
+}
+#canteensmenu ul li.selected {
+  font-weight: bold;
+  color: black;
+}
+#canteensmenu ul li span:first-child {
+  text-transform: capitalize;
+}
+
+#busplan ul {
+  list-style-type: none;
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 0px;
+  display: grid;
+  grid-template-columns: 4fr 6fr 2fr;
+}
+#busplan ul:first-of-type li {
+  font-weight: bold;
+  border-bottom: solid 1px #000;
+}
+#busplan ul li:last-child {
+  text-align: right;
+}
+
+#eventlist > div {
+  display: grid;
+  grid-template-columns: 1fr 3fr 3fr 3fr 2fr;
+  border: solid 1px #000;
+}
+#eventlist > div div {
+  background-color: #fff;
+  padding: 0.5rem;
+}
+#eventlist > div :nth-child(10n+1),
+#eventlist > div :nth-child(10n+2),
+#eventlist > div :nth-child(10n+3),
+#eventlist > div :nth-child(10n+4),
+#eventlist > div :nth-child(10n+5) {
+  background-color: #f2f2f2;
+}
+#eventlist > div .day {
+  background-color: #ccc;
+  grid-column-start: 1;
+  grid-column-end: 6;
+}
+#eventlist > div .eventHead {
+  font-weight: bold;
+  background-color: #ccc;
+  border-bottom: solid 1px #000;
+}/*# sourceMappingURL=styles.css.map */

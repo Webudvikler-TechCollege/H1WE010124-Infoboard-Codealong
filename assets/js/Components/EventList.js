@@ -81,9 +81,18 @@ export const EventList = async () => {
 		arrSlicedEvents = arrCurDayEvents.slice(0, config.max_num_events)
 	}
 
+
 	// Create html elements for the events
 	const div = document.createElement('div')
-	div.classList.add('event-list')
+	div.classList.add('scheme')
+
+	const arrEventHeaders = ["Tid","Uddannelse","Fag","Hold","Lokale"]
+	for(let elm of arrEventHeaders) {
+		const divHeader = document.createElement('div')
+		divHeader.classList.add('eventHead')
+		divHeader.innerText = elm
+		div.append(divHeader)
+	}
 
 	arrSlicedEvents.map(event => {
 		if(event.Day) {
@@ -109,5 +118,5 @@ export const EventList = async () => {
 
 	})
 
-	document.getElementById('events').append(div)
+	document.getElementById('eventlist').append(div)
 }

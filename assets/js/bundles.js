@@ -1,10 +1,12 @@
 /**
  * Import all the components
  */
+import { DateClock } from './Components/DateClock.js'
 import { BusPlan } from './Components/BusPlan.js'
-import { CanteenMenu } from './Components/CanteenMenu.js'
+import { CanteensMenu } from './Components/CanteensMenu.js'
 import { EventList } from './Components/EventList.js'
 
-//BusPlan()
-//CanteenMenu()
+DateClock()
+BusPlan()
+CanteensMenu()
 EventList()

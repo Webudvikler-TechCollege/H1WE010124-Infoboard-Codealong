@@ -6,14 +6,15 @@ import { myFetch } from "../Utils/apiUtils.js"
 export const BusPlan = async () => {
 	// Get the container e1ement
 	const container = document.getElementById('busplan')
-	// Clear the container
-	container.innerHTML = ''
 	
 	// Get the data from the API
 	const endpoint = `https://xmlopen.rejseplanen.dk/bin/rest.exe/multiDepartureBoard?id1=851400602&id2=851973402&rttime&format=json&useBus=1`
 	const apiData = await myFetch(endpoint)
 	// Slice the data to get only the first 5 departures
 	const slicedData = apiData.MultiDepartureBoard?.Departure.slice(0, 5)
+
+	// Clear the container
+	container.innerHTML = ''
 
 	// Create the unordered list element headers
 	const ul = document.createElement('ul')
