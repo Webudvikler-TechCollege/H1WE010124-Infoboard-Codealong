@@ -1,2 +1,2 @@
-# Infoboard Codealong 2024
-Vanilla JS CodeAlong til Medieafdelingens infoboard April 2024
+# Infoboard Codealong
+Vanilla JS CodeAlong til Medieafdelingens infoboard
