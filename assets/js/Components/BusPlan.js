@@ -8,10 +8,12 @@ export const BusPlan = async () => {
 	const container = document.getElementById('busplan')
 	
 	// Get the data from the API
-	const endpoint = `https://xmlopen.rejseplanen.dk/bin/rest.exe/multiDepartureBoard?id1=851400602&id2=851973402&rttime&format=json&useBus=1`
+	//const endpoint = `https://xmlopen.rejseplanen.dk/bin/rest.exe/multiDepartureBoard?id1=851400602&id2=851973402&rttime&format=json&useBus=1`
+	const endpoint = `https://www.rejseplanen.dk/api/nearbyDepartureBoard?accessId=5b71ed68-7338-4589-8293-f81f0dc92cf2&originCoordLat=57.048731&originCoordLong=9.968186&format=json`
 	const apiData = await myFetch(endpoint)
+	
 	// Slice the data to get only the first 5 departures
-	const slicedData = apiData.MultiDepartureBoard?.Departure.slice(0, 5)
+	const slicedData = apiData.Departure.slice(0, 5)
 
 	// Clear the container
 	container.innerHTML = ''
@@ -26,7 +28,7 @@ export const BusPlan = async () => {
 	liTime.innerText = 'Tid'
 	// Append the list elements to the ul element
 	ul.append(liLine, liDirection, liTime)
-	container.append(ul)
+	container.append(ul)	
 
 	// Map the sliced data and create the list elements with data values
 	if(slicedData.length) {
@@ -48,7 +50,7 @@ export const BusPlan = async () => {
 			container.append(ul)
 		})
 	}
-	setTimeout(BusPlan,3600)
+	//setTimeout(BusPlan,3600)
 }
 
 /**
@@ -57,15 +59,16 @@ export const BusPlan = async () => {
  * @returns 
  */
 export const calcRemaingTime = departureTime => {
+	
 	// Get the current timestamp
 	const curTimeStamp = new Date().getTime();
 	// Split the departure time into an array
-	const arrDepTime = departureTime.split(/[.: ]/);
+	const arrDepTime = departureTime.split(/[- :]/);
 	
 	// Create a new date object with the departure time
 	const depYear = new Date().getFullYear();
 	const depMonth = parseInt(arrDepTime[1],10)-1
-	const depDay = parseInt(arrDepTime[0],10)
+	const depDay = parseInt(arrDepTime[2],10)
 	const depHours = parseInt(arrDepTime[3],10)
 	const depMinutes = parseInt(arrDepTime[4],10)
 

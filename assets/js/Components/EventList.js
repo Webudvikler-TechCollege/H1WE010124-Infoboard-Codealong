@@ -11,8 +11,7 @@ export const EventList = async () => {
 	const { value: eventData } = apiData
 
 	// Fetch the friendly words from the API
-	const friendlyApiData = await myFetch('https://api.mediehuset.net/infoboard/subjects')
-	const { result: friendlyData } = friendlyApiData
+	const friendlyData = config.array_words
 
 	// Filter the data for the valid educations
 	const filteredData = eventData.filter(elm => 
@@ -27,6 +26,8 @@ export const EventList = async () => {
 		// Set a property on the event object with a timestamp
 		event.Timestamp = new Date(event.StartDate).getTime()
 
+		console.log(friendlyData);
+		
 		// Set a property on the event object with the friendly name if the education or subject exists
 		friendlyData.map(word => {
 			if(word.name.toUpperCase() === event.Education.toUpperCase()) {
