@@ -26,8 +26,6 @@ export const EventList = async () => {
 		// Set a property on the event object with a timestamp
 		event.Timestamp = new Date(event.StartDate).getTime()
 
-		console.log(friendlyData);
-		
 		// Set a property on the event object with the friendly name if the education or subject exists
 		friendlyData.map(word => {
 			if(word.name.toUpperCase() === event.Education.toUpperCase()) {
